@@ -33,7 +33,6 @@ pub enum AxisType {
     // Misc identifiers incase you have a really crazy device on your hands.
     Throttle(u8),
     Stick(u8),
-    Trigger(u8),
     Slider(u8),
     Rotor(u8),
     Other(u8),
@@ -43,7 +42,6 @@ pub enum AxisType {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize)]
 pub enum ButtonType {
     Button(u8),
-    Trigger(u8),
     Function(u8),
     // D-pad/ hat switch types. use these in a group rather than 
     // as a button- that way you can use them multiple times!

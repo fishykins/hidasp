@@ -3,9 +3,9 @@
 
 [![Minimum Supported Rust Version]][Rust 1.56]
 
-provides a mapping solution for devices using the Windows [HID](https://docs.microsoft.com/en-us/windows-hardware/drivers/hid/) protocol.
+Hidasp is a mapping solution for devices using the Windows [HID](https://docs.microsoft.com/en-us/windows-hardware/drivers/hid/) protocol.
 This mapping is agnostic: it simply provides a coherent instruction set for reading device buffers.
-Various utilities are included to help with common functionality, such as data parsing, mpa building, etc.
+Various utilities are included to help with common functionality, such as data parsing, map building, etc.
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
