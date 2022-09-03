@@ -1,0 +1,15 @@
+[package]
+name = "hidasp"
+version = "0.1.0"
+edition = "2021"
+authors = ["Fishykins <caspar.m.green@gmail.com>"]
+description = "Hid-and-seek-protocol for mapping out hid compliant devices."
+keywords = ["HID", "input", "jostick", "controller"]
+license = "MIT/Apache-2.0"
+repository = "https://github.com/fishykins/hid-and-seek"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ron = "0.8"
+serde = "1.0"

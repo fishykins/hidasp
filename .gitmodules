@@ -1,0 +1,3 @@
+[submodule "hid_mappings"]
+	path = hid_mappings
+	url = https://github.com/fishykins/hid_mappings.git
