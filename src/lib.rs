@@ -1,79 +1,52 @@
-pub mod bindings;
-pub mod maps;
-pub mod utils;
-mod errors;
-
-pub use errors::Error;
-use maps::*;
-use ron::de::from_reader;
+mod buffer_map;
+mod bindings;
+pub mod loading;
+pub use bindings::*;
+pub use buffer_map::*;
 use serde::Deserialize;
-use std::fs::File;
+use std::collections::HashMap;
 
-/// A unique identifier set by the manufacturer of a device.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize)]
-pub struct DeviceType {
-    pub vendor_id: u16,
-    pub product_id: u16,
+pub type InputBuffer = [u8; 256];
+pub type BufferPointer = u8;
+
+/// This is where all data pertaining to a device is held.
+pub type DeviceMap = HashMap<Bind, InputType>;
+
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
+pub struct ButtonPointer(pub BufferPointer, pub ButtonQuery);
+
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Default)]
+pub struct AxisPointer {
+    /// The buffer index on which the fine value is stored. This combines the the coarse value to get the total axis value.
+    pub fine: BufferPointer,
+    /// The buffer on which the coarse value is stored. This is usually the one sequentially after the fine parameter.
+    pub coarse: BufferPointer,
+    /// The number of coarse 'octaves' in the buffer. Low-fidelity axis will have 4, while top-end devices can go all the way up to 256.
+    pub octaves: u8,
+    /// Inverting of an axis.
+    pub inverted: bool,
+    /// An absolute axis will only have values between 0 and 1 (once normalized).
+    pub abs: bool,
 }
 
-/// The main data structure representation of a human-interface-device.
-#[derive(Debug, Clone, Deserialize)]
-pub struct HumanInterfaceDevice {
-    pub name: String,
-    pub device_type: DeviceType,
-    pub map: HidMap,
+/// Rules for collecting button data from input buffers.
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
+pub enum ButtonQuery {
+    /// A bit query does an & opperation on the input buffer.
+    Bit(u8),
+    /// Eq requires the buffer to be an exact match to the provided value.
+    Eq(u8),
 }
 
-impl PartialEq for HumanInterfaceDevice {
-    fn eq(&self, other: &Self) -> bool {
-        self.device_type == other.device_type
-    }
-}
-
-impl HumanInterfaceDevice {
-    /// Creates a new human interface device from a file, relative to the manifest directory.
-    pub fn from_file(filename: &str) -> Result<Self, Error> {
-        let input_path = format!("{}/{}", env!("CARGO_MANIFEST_DIR"), filename);
-        let f = match File::open(&input_path) {
-            Ok(f) => f,
-            Err(e) => {
-                return Err(Error::new(format!("failed to open stick config: {}", e)));
-            }
-        };
-
-        let stick: Self = match from_reader(f) {
-            Ok(x) => x,
-            Err(e) => {
-                return Err(Error::new(format!("failed to parse stick config: {}", e)));
-            }
-        };
-        Ok(stick)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use utils::*;
-
-    #[test]
-    fn test_from_file() {
-        let input_path = "devices/nxt_gladiator.ron";
-        let joystick = HumanInterfaceDevice::from_file(&input_path).unwrap();
-        assert_eq!(joystick.device_type.product_id, 512);
-        assert_eq!(joystick.device_type.vendor_id, 8989);
-    }
-
-    #[test]
-    fn test_utils() {
-        let input_path = "devices/nxt_gladiator.ron";
-        let joystick = HumanInterfaceDevice::from_file(&input_path).unwrap();
-
-        let used = get_used_buffer_indices(&joystick.map);
-        assert_eq!(used, vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 17, 18, 19, 33, 48, 49]);
-
-        let inverted_map = build_buffer_map(&joystick.map);
-        assert_eq!(used.len(), inverted_map.len());
-        println!("{:?}", inverted_map)
-    }
+/// Splits input into four components.
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub enum InputType {
+    /// A single button.
+    Button(ButtonPointer),
+    /// A single axis.
+    Axis(AxisPointer),
+    /// A collection of buttons.
+    ButtonGroup(HashMap<BindId, ButtonPointer>),
+    /// A collection of axes.
+    AxisGroup(HashMap<BindId, AxisPointer>),
 }
