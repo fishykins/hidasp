@@ -79,7 +79,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_load_device() {
+    fn test_buffer_map() {
         let device_map = load_device(8989, 512, "map_1").unwrap();
         let buffer_map = build_buffer_map(&device_map);
         assert_eq!(buffer_map.len(), 18);

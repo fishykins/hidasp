@@ -1,6 +1,7 @@
 mod buffer_map;
 mod bindings;
 pub mod loading;
+pub mod utils;
 pub use bindings::*;
 pub use buffer_map::*;
 use serde::Deserialize;
