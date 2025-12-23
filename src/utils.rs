@@ -2,6 +2,7 @@ use crate::BufferMap;
 
 /// Determines the last buffer index required by this mapping.
 /// This is not a fast function, use at your own risk!
+#[cfg(feature = "buffer_map")]
 pub fn get_buffer_length(buffer_map: &BufferMap) -> usize {
     let mut max_i: usize = 256;
 
@@ -15,6 +16,7 @@ pub fn get_buffer_length(buffer_map: &BufferMap) -> usize {
 }
 
 /// Returns a vec of used buffer indices.
+#[cfg(feature = "buffer_map")]
 pub fn get_used_buffers(buffer_map: &BufferMap) -> Vec<usize> {
     buffer_map.iter().map(|(i, _)| *i as usize).collect()
 }

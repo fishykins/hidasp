@@ -1,9 +1,13 @@
-mod buffer_map;
-mod bindings;
 pub mod loading;
 pub mod utils;
+mod bindings;
 pub use bindings::*;
+
+#[cfg(feature = "buffer_map")]
+mod buffer_map;
+#[cfg(feature = "buffer_map")]
 pub use buffer_map::*;
+
 use serde::Deserialize;
 use std::collections::HashMap;
 
